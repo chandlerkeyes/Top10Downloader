@@ -5,7 +5,6 @@ import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.ArrayAdapter
 import android.widget.ListView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.net.URL
@@ -75,9 +74,6 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "onPostExecute: parameter is $result")
                 val parsingApplication = ParsingApplication()
                 parsingApplication.parse(result)
-
-//                val arrayAdapter = ArrayAdapter<FeedEntry>(propContext, R.layout.list_item, parsingApplication.applications)
-//                propListView.adapter = arrayAdapter
 
                 val feedAdapter = FeedAdapter(propContext, R.layout.list_record, parsingApplication.applications )
                 propListView.adapter = feedAdapter
