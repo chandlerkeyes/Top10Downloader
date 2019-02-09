@@ -5,6 +5,9 @@ import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.ListView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.net.URL
@@ -41,6 +44,15 @@ class MainActivity : AppCompatActivity() {
 
         downloadData.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml")
         Log.d(TAG, "onCreate done")
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.feeds_menu, menu)
+        return true;
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onDestroy() {
