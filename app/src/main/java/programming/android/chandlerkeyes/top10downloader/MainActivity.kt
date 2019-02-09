@@ -35,25 +35,48 @@ class MainActivity : AppCompatActivity() {
     private var feedUrl: String = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=%d/xml"
     private var feedLimit: Int = 10
 
+    private var feedCachedUrl = "INVALIDATED"
+    private val STATE_URL = "feedUrl"
+    private val STATE_LIMIT = "feedLimit"
+
     private var downloadData: DownloadData? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Log.d(TAG, "onCreate called")
+
+        if(savedInstanceState != null) {
+            feedUrl = savedInstanceState.getString(STATE_URL)
+            feedLimit = savedInstanceState.getInt(STATE_LIMIT)
+        }
+
         downloadUrl(feedUrl.format(feedLimit))
         Log.d(TAG, "onCreate done")
     }
 
     private fun downloadUrl(feedUrl: String) {
-        downloadData = DownloadData(this, xmlListView)
-        Log.d(TAG, "downloadUrl started")
-        downloadData?.execute(feedUrl)
-        Log.d(TAG, "downloadUrl done ")
+        if (feedUrl != feedCachedUrl) {
+            downloadData = DownloadData(this, xmlListView)
+            Log.d(TAG, "downloadUrl started")
+            downloadData?.execute(feedUrl)
+            Log.d(TAG, "downloadUrl done ")
+            feedCachedUrl = feedUrl
+        } else {
+            Log.d(TAG, "downloadUrl - URL not changed")
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.feeds_menu, menu)
+
+        if (feedLimit == 10) {
+            menu?.findItem(R.id.mnu10)?.isChecked = true
+        } else {
+            menu?.findItem(R.id.mnu25)?.isChecked = true
+        }
+
         return true;
     }
 
@@ -73,10 +96,17 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     Log.d(TAG, "onOptionsItemSelected: ${item.title} setting feedLimit unchanged")
                 }
+            R.id.mnuRefresh -> feedCachedUrl = "INVALIDATED"
             else -> return super.onOptionsItemSelected(item)
         }
         downloadUrl(feedUrl.format(feedLimit))
         return true
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(STATE_URL, feedUrl)
+        outState.putInt(STATE_LIMIT, feedLimit)
     }
 
     override fun onDestroy() {
